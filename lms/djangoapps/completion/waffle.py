@@ -33,6 +33,10 @@ ENABLE_COURSE_VISUAL_PROGRESS = 'enable_course_visual_progress'
 # SiteConfiguration visual progress enablement
 ENABLE_SITE_VISUAL_PROGRESS = 'enable_site_visual_progress'
 
+# Full name completion.enable_new_course_outline
+# Enables the UI changes to the course outline, including
+# progress indicators in the course outline.
+ENABLE_NEW_COURSE_OUTLINE = 'enable_new_course_outline'
 
 def waffle():
     """
@@ -83,3 +87,22 @@ def visual_progress_enabled(course_key):
         return waffle_flag()[ENABLE_COURSE_VISUAL_PROGRESS].is_enabled(course_key)
 
     return True
+
+
+def new_course_outline_enabled(course_key):
+    """
+    Returns whether the new course outline is enabled,
+    which requires visual progress to be enabled, as well.
+
+    :return:
+        bool -> True if visual progress is enabled
+        and the new course outline is enabled
+    """
+    return waffle().is_enabled(ENABLE_NEW_COURSE_OUTLINE) and visual_progress_enabled(course_key)
+
+
+def site_configuration_enabled():
+    """
+    Helper function to return site-aware feature switch
+    :return: bool -> True if site enabled for visual progress tracking
+    """
