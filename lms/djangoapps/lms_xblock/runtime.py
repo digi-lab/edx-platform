@@ -9,6 +9,7 @@ from badges.service import BadgingService
 from badges.utils import badges_enabled
 from lms.djangoapps.lms_xblock.models import XBlockAsidesConfig
 from lms.djangoapps.completion.services import CompletionService
+from lms.djangoapps.completion import waffle as completion_waffle
 from openedx.core.djangoapps.user_api.course_tag import api as user_course_tag_api
 from openedx.core.lib.url_utils import quote_slashes
 from openedx.core.lib.xblock_utils import xblock_local_resource_url
@@ -138,6 +139,7 @@ class LmsModuleSystem(ModuleSystem):  # pylint: disable=abstract-method
 
         services = kwargs.setdefault('services', {})
         services['completion'] = CompletionService(user=kwargs.get('user'), course_key=kwargs.get('course_id'))
+        services['completion_waffle'] = completion_waffle
         services['fs'] = xblock.reference.plugins.FSService()
         services['i18n'] = ModuleI18nService
         services['library_tools'] = LibraryToolsService(store)

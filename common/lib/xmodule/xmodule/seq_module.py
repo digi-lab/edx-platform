@@ -9,6 +9,7 @@ import logging
 from datetime import datetime
 
 from lxml import etree
+from opaque_keys.edx.keys import UsageKey
 from pkg_resources import resource_string
 from pytz import UTC
 from six import text_type
@@ -161,6 +162,8 @@ class ProctoringFields(object):
 @XBlock.wants('verification')
 @XBlock.wants('gating')
 @XBlock.wants('credit')
+@XBlock.wants('completion')
+@XBlock.wants('completion_waffle')
 @XBlock.needs('user')
 @XBlock.needs('bookmarks')
 class SequenceModule(SequenceFields, ProctoringFields, XModule):
@@ -206,6 +209,25 @@ class SequenceModule(SequenceFields, ProctoringFields, XModule):
                 self.position = 1
             return json.dumps({'success': True})
 
+        if dispatch == 'get_completion':
+            if not self.is_user_authenticated:
+                # Without user logged in, we cannot display complete data
+                return None
+
+            completion_waffle = self.runtime.service(self, 'completion_waffle')
+            if not completion_waffle.visual_progress_enabled(self.runtime.course_id):
+                return None
+
+            usage_key = data.get('usage_key', None)
+            item = self.get_child(UsageKey.from_string(usage_key))
+            if not item:
+                return None
+
+            completion_service = self.runtime.service(self, 'completion')
+            complete = completion_service.vertical_is_complete(item)
+            return json.dumps({
+                'complete': complete
+            })
         raise NotFoundError('Unexpected dispatch type')
 
     @classmethod
@@ -414,6 +436,7 @@ class SequenceModule(SequenceFields, ProctoringFields, XModule):
         """
         is_user_authenticated = self.is_user_authenticated(context)
         bookmarks_service = self.runtime.service(self, 'bookmarks')
+        completion_service = self.runtime.service(self, 'completion')
         context['username'] = self.runtime.service(self, 'user').get_current_user().opt_attrs.get(
             'edx-platform.username')
         display_names = [
@@ -454,6 +477,11 @@ class SequenceModule(SequenceFields, ProctoringFields, XModule):
                 'bookmarked': is_bookmarked,
                 'path': " > ".join(display_names + [item.display_name_with_default]),
             }
+
+            completion_waffle = self.runtime.service(self, 'completion_waffle')
+            if completion_waffle.visual_progress_enabled(self.runtime.course_id):
+                complete = completion_service.vertical_is_complete(item) if is_user_authenticated else None
+                iteminfo['complete'] = complete
 
             contents.append(iteminfo)
 
