@@ -1,17 +1,19 @@
 """
 Tests of completion xblock runtime services
 """
+from completion.models import BlockCompletion
+from completion.services import CompletionService
+from completion.test_utils import CompletionWaffleTestMixin
 import ddt
 from django.test import TestCase
 from opaque_keys.edx.keys import CourseKey, UsageKey
-from student.tests.factories import UserFactory
 
-from ..models import BlockCompletion
-from ..services import CompletionService
-from ..test_utils import CompletionWaffleTestMixin
+from openedx.core.djangolib.testing.utils import skip_unless_lms
+from student.tests.factories import UserFactory
 
 
 @ddt.ddt
+@skip_unless_lms
 class CompletionServiceTestCase(CompletionWaffleTestMixin, TestCase):
     """
     Test the data returned by the CompletionService.

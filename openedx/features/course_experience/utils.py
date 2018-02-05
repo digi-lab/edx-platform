@@ -1,8 +1,9 @@
 """
 Common utilities for the course experience, including course outline.
 """
-from lms.djangoapps.completion.models import BlockCompletion
-from lms.djangoapps.completion.waffle import visual_progress_enabled
+from completion.models import BlockCompletion
+from completion.waffle import visual_progress_enabled
+
 from lms.djangoapps.course_api.blocks.api import get_blocks
 from lms.djangoapps.course_blocks.utils import get_student_module_as_dict
 from opaque_keys.edx.keys import CourseKey, UsageKey

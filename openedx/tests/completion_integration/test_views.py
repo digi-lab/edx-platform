@@ -3,18 +3,20 @@
 Test models, managers, and validators.
 """
 
+from completion import waffle
 import ddt
 from django.core.urlresolvers import reverse
 from rest_framework.test import APIClient, force_authenticate
 
-from completion import waffle
 from student.tests.factories import UserFactory, CourseEnrollmentFactory
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
 from openedx.core.djangoapps.content.course_structures.tasks import update_course_structure
+from openedx.core.djangolib.testing.utils import skip_unless_lms
 
 
 @ddt.ddt
+@skip_unless_lms
 class CompletionBatchTestCase(ModuleStoreTestCase):
     """
     Test that BlockCompletion.objects.submit_batch_completion has the desired

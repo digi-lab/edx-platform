@@ -4,15 +4,16 @@ Test models, managers, and validators.
 
 from __future__ import absolute_import, division, print_function, unicode_literals
 
+from completion import models, waffle
 from django.core.exceptions import ValidationError
 from django.test import TestCase
-
 from opaque_keys.edx.keys import CourseKey, UsageKey
+
+from openedx.core.djangolib.testing.utils import skip_unless_lms
 from student.tests.factories import CourseEnrollmentFactory, UserFactory
 
-from .. import models, waffle
 
-
+@skip_unless_lms
 class PercentValidatorTestCase(TestCase):
     """
     Test that validate_percent only allows floats (and ints) between 0.0 and 1.0.
@@ -39,6 +40,7 @@ class CompletionSetUpMixin(object):
         )
 
 
+@skip_unless_lms
 class SubmitCompletionTestCase(CompletionSetUpMixin, TestCase):
     """
     Test that BlockCompletion.objects.submit_completion has the desired
@@ -114,6 +116,7 @@ class SubmitCompletionTestCase(CompletionSetUpMixin, TestCase):
         self.assertEqual(models.BlockCompletion.objects.count(), 1)
 
 
+@skip_unless_lms
 class CompletionDisabledTestCase(CompletionSetUpMixin, TestCase):
 
     @classmethod
@@ -143,6 +146,7 @@ class CompletionDisabledTestCase(CompletionSetUpMixin, TestCase):
         self.assertEqual(models.BlockCompletion.objects.count(), 1)
 
 
+@skip_unless_lms
 class SubmitBatchCompletionTestCase(TestCase):
     """
     Test that BlockCompletion.objects.submit_batch_completion has the desired
@@ -188,6 +192,7 @@ class SubmitBatchCompletionTestCase(TestCase):
         self.assertEqual(model.completion, 1.0)
 
 
+@skip_unless_lms
 class BatchCompletionMethodTests(TestCase):
 
     def setUp(self):
