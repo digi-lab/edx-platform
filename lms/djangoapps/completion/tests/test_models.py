@@ -11,6 +11,7 @@ from opaque_keys.edx.keys import CourseKey, UsageKey
 from student.tests.factories import CourseEnrollmentFactory, UserFactory
 
 from .. import models, waffle
+from ..utils import get_url_to_last_completed_block
 
 
 class PercentValidatorTestCase(TestCase):
@@ -246,4 +247,14 @@ class BatchCompletionMethodTests(TestCase):
         self.assertEqual(
             models.BlockCompletion.get_latest_block_completed(self.user, self.course_key).block_key,
             self.block_keys[2]
+        )
+
+    def test_get_url_to_last_completed_block(self):
+        enrollment = CourseEnrollmentFactory.create(
+            user=self.user,
+            course_id=self.course_key
+        )
+        self.assertEqual(
+            get_url_to_last_completed_block(self.user, enrollment),
+            u'/courses/edX/MOOC101/2049_T2/jump_to/i4x://edX/MOOC101/video/2'
         )
