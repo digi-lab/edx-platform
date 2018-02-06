@@ -49,6 +49,7 @@ from student.models import (
 )
 from util.milestones_helpers import get_pre_requisite_courses_not_completed
 from xmodule.modulestore.django import modulestore
+from lms.djangoapps.completion.models import BlockCompletion
 
 log = logging.getLogger("edx.student")
 
@@ -453,6 +454,10 @@ def _credit_statuses(user, course_enrollments):
     return statuses
 
 
+def redirect_user_to_account_settings_if_they_dont_exist(user):
+    if not UserProfile.objects.filter(user=user).exists():
+        return redirect(reverse('account_settings'))
+
 @login_required
 @ensure_csrf_cookie
 def student_dashboard(request):
@@ -468,11 +473,12 @@ def student_dashboard(request):
         The dashboard response.
 
     """
+    # import pudb.b
     user = request.user
-    if not UserProfile.objects.filter(user=user).exists():
-        return redirect(reverse('account_settings'))
+    redirect_user_to_account_settings_if_they_dont_exist(user)
 
     platform_name = configuration_helpers.get_value("platform_name", settings.PLATFORM_NAME)
+
     enable_verified_certificates = configuration_helpers.get_value(
         'ENABLE_VERIFIED_CERTIFICATES',
         settings.FEATURES.get('ENABLE_VERIFIED_CERTIFICATES')
@@ -708,6 +714,7 @@ def student_dashboard(request):
         ]
 
     context = {
+        'resume_blocks': last_block_completed_per_course,
         'urls': urls,
         'program_data': program_data,
         'enterprise_message': enterprise_message,
