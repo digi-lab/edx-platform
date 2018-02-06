@@ -455,10 +455,6 @@ def _credit_statuses(user, course_enrollments):
     return statuses
 
 
-def redirect_user_to_account_settings_if_they_dont_exist(user):
-    if not UserProfile.objects.filter(user=user).exists():
-        return redirect(reverse('account_settings'))
-
 @login_required
 @ensure_csrf_cookie
 def student_dashboard(request):
@@ -476,7 +472,8 @@ def student_dashboard(request):
     """
     # import pudb.b
     user = request.user
-    redirect_user_to_account_settings_if_they_dont_exist(user)
+    if not UserProfile.objects.filter(user=user).exists():
+        return redirect(reverse('account_settings'))
 
     platform_name = configuration_helpers.get_value("platform_name", settings.PLATFORM_NAME)
 
@@ -714,6 +711,7 @@ def student_dashboard(request):
             enr for enr in course_enrollments if entitlement.enrollment_course_run.course_id != enr.course_id
         ]
 
+    # Gather urls for resume buttons in course cards.
     course_card_resume_button_urls = []
 
     for enrollment in course_enrollments:
