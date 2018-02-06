@@ -13,6 +13,7 @@ from django.core.urlresolvers import NoReverseMatch, reverse, reverse_lazy
 from django.shortcuts import redirect
 from django.utils.translation import ugettext as _
 from django.views.decorators.csrf import csrf_exempt, ensure_csrf_cookie
+
 from opaque_keys.edx.keys import CourseKey
 from pytz import UTC
 from six import text_type, iteritems
@@ -49,7 +50,7 @@ from student.models import (
 )
 from util.milestones_helpers import get_pre_requisite_courses_not_completed
 from xmodule.modulestore.django import modulestore
-from lms.djangoapps.completion.models import BlockCompletion
+from lms.djangoapps.completion.utils import get_url_to_last_completed_block
 
 log = logging.getLogger("edx.student")
 
@@ -713,13 +714,17 @@ def student_dashboard(request):
             enr for enr in course_enrollments if entitlement.enrollment_course_run.course_id != enr.course_id
         ]
 
-    last_block_completed_per_course = [
-        BlockCompletion.get_latest_block_completed(user, enrollment.course_id) 
-        for enrollment in course_enrollments 
-        ]
+    course_card_resume_button_urls = []
+
+    for enrollment in course_enrollments:
+        try:
+            urlToBlock = get_url_to_last_completed_block(user, enrollment)
+        except:
+            urlToBlock = 'dashboard'
+        course_card_resume_button_urls.append(urlToBlock)
 
     context = {
-        'resume_blocks': last_block_completed_per_course,
+        'resume_blocks': course_card_resume_button_urls,
         'urls': urls,
         'program_data': program_data,
         'enterprise_message': enterprise_message,
