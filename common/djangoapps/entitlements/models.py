@@ -11,6 +11,12 @@ from lms.djangoapps.certificates.models import GeneratedCertificate
 from model_utils.models import TimeStampedModel
 from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
 
+ENTITLEMENT_SUPPORT_REASONS = (
+    ('0', u'Course has no enrollable runs'),
+    ('1', u'Learner requested session change'),
+    ('2', u'Other'),
+)
+
 
 class CourseEntitlementPolicy(models.Model):
     """
@@ -301,3 +307,19 @@ class CourseEntitlement(TimeStampedModel):
             expired_at__isnull=False,
             enrollment_course_run=None
         ).select_related('user').select_related('enrollment_course_run')
+
+
+class CourseEntitlementSupportDetail(TimeStampedModel):
+    """
+    Table recording support interactions with an entitlement
+    """
+    entitlement = models.ForeignKey('entitlements.CourseEntitlement')
+    support_user = models.ForeignKey(settings.AUTH_USER_MODEL, null=True)
+
+    reason = models.CharField(max_length=1, choices=ENTITLEMENT_SUPPORT_REASONS)
+    comments = models.TextField(null=True)
+
+    unenrolled_run = models.ForeignKey(
+        CourseOverview,
+        db_constraint=False,
+    )
