@@ -713,6 +713,11 @@ def student_dashboard(request):
             enr for enr in course_enrollments if entitlement.enrollment_course_run.course_id != enr.course_id
         ]
 
+    last_block_completed_per_course = [
+        BlockCompletion.get_latest_block_completed(user, enrollment.course_id) 
+        for enrollment in course_enrollments 
+        ]
+
     context = {
         'resume_blocks': last_block_completed_per_course,
         'urls': urls,
