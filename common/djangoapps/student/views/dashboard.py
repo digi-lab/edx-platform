@@ -455,6 +455,17 @@ def _credit_statuses(user, course_enrollments):
     return statuses
 
 
+def _get_urls_for_resume_buttons(enrollments):
+    resume_button_urls = []
+    for enrollment in enrollments:
+        try:
+            urlToBlock = get_url_to_last_completed_block(user, enrollment)
+        except:
+            urlToBlock = 'dashboard'
+        resume_button_urls.append(urlToBlock)
+    return resume_button_urls
+
+
 @login_required
 @ensure_csrf_cookie
 def student_dashboard(request):
@@ -712,14 +723,7 @@ def student_dashboard(request):
         ]
 
     # Gather urls for resume buttons in course cards.
-    course_card_resume_button_urls = []
-
-    for enrollment in course_enrollments:
-        try:
-            urlToBlock = get_url_to_last_completed_block(user, enrollment)
-        except:
-            urlToBlock = 'dashboard'
-        course_card_resume_button_urls.append(urlToBlock)
+    course_card_resume_button_urls = _get_urls_for_resume_buttons(course_enrollments + course_entitlements)
 
     context = {
         'resume_blocks': course_card_resume_button_urls,
