@@ -12,9 +12,11 @@ from model_utils.models import TimeStampedModel
 from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
 
 ENTITLEMENT_SUPPORT_REASONS = (
-    ('0', u'Course has no enrollable runs'),
-    ('1', u'Learner requested session change'),
-    ('2', u'Other'),
+    ('0', u'Learner requested leave session for expired entitlement'),
+    ('1', u'Learner requested session change for expired entitlement'),
+    ('1', u'Learner requested new entitlement'),
+    ('2', u'Course team requested entitlement for learnerg'),
+    ('3', u'Other'),
 )
 
 
