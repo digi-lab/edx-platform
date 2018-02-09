@@ -22,7 +22,7 @@ class Migration(migrations.Migration):
                 ('id', models.AutoField(verbose_name='ID', serialize=False, auto_created=True, primary_key=True)),
                 ('created', model_utils.fields.AutoCreatedField(default=django.utils.timezone.now, verbose_name='created', editable=False)),
                 ('modified', model_utils.fields.AutoLastModifiedField(default=django.utils.timezone.now, verbose_name='modified', editable=False)),
-                ('reason', models.CharField(max_length=1, choices=[(b'0', b'Course has no enrollable runs'), (b'1', b'Learner requested session change'), (b'2', b'Other')])),
+                ('reason', models.CharField(max_length=1, choices=[(b'0', 'Learner requested leave session for expired entitlement'), (b'1', 'Learner requested session change for expired entitlement'), (b'1', 'Learner requested new entitlement'), (b'2', 'Course team requested entitlement for learnerg'), (b'3', 'Other')])),
                 ('comments', models.TextField(null=True)),
                 ('entitlement', models.ForeignKey(to='entitlements.CourseEntitlement')),
                 ('support_user', models.ForeignKey(to=settings.AUTH_USER_MODEL, null=True)),
