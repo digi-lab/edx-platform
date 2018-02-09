@@ -4,6 +4,7 @@ from util.date_utils import strftime_localized
 
 from django.conf import settings
 from django.contrib.sites.models import Site
+from django.contrib.auth.models import User
 from django.db import models
 from django.utils.timezone import now
 
@@ -148,6 +149,16 @@ class CourseEntitlement(TimeStampedModel):
         help_text='The current Course enrollment for this entitlement. If NULL the Learner has not enrolled.',
         blank=True
     )
+    # TODO: change this to a foreign key pointing to the DB that holds list of digital books
+    digital_book_key = models.CharField(max_length=200, null=True)
+    COURSE = 'c'
+    DIGITAL_BOOK = 'db'
+    ENTITLEMENT_TYPE_CHOICES = (
+        (COURSE, 'course'),
+        (DIGITAL_BOOK, 'digital book')
+    )
+    entitlement_type = models.CharField(max_length=2, choices=ENTITLEMENT_TYPE_CHOICES, default=COURSE)
+
     order_number = models.CharField(max_length=128, null=True)
     _policy = models.ForeignKey(CourseEntitlementPolicy, null=True, blank=True)
 
@@ -301,3 +312,18 @@ class CourseEntitlement(TimeStampedModel):
             expired_at__isnull=False,
             enrollment_course_run=None
         ).select_related('user').select_related('enrollment_course_run')
+
+    @classmethod
+    def get_or_create_digital_book_entitlement(cls, username, book_key):
+
+        user_id = User.objects.filter(username=username).values()[0]['id']
+
+        entitlement, created = cls.objects.get_or_create(
+            user_id=user_id,
+            digital_book_key=book_key,
+            entitlement_type=cls.DIGITAL_BOOK,
+            course_uuid=null
+        )
+
+        return entitlement, created
+
