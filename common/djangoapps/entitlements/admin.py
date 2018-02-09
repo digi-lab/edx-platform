@@ -55,8 +55,9 @@ class CourseEntitlementSupportDetailAdmin(admin.ModelAdmin):
                     'reason',
                     'comments',
                     'unenrolled_run')
-
+    raw_id_fields = ('unenrolled_run', 'support_user',)
     form = CourseEntitlementSupportDetailForm
+    
 
 
 @admin.register(CourseEntitlementPolicy)

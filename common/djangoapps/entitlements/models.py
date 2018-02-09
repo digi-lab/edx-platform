@@ -11,13 +11,6 @@ from lms.djangoapps.certificates.models import GeneratedCertificate
 from model_utils.models import TimeStampedModel
 from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
 
-ENTITLEMENT_SUPPORT_REASONS = (
-    ('0', u'Learner requested leave session for expired entitlement'),
-    ('1', u'Learner requested session change for expired entitlement'),
-    ('1', u'Learner requested new entitlement'),
-    ('2', u'Course team requested entitlement for learnerg'),
-    ('3', u'Other'),
-)
 
 
 class CourseEntitlementPolicy(models.Model):
@@ -315,13 +308,27 @@ class CourseEntitlementSupportDetail(TimeStampedModel):
     """
     Table recording support interactions with an entitlement
     """
+    LEAVESESSION = 'LS'
+    CHANGESESSION = 'CS'
+    LEARNER_REQUEST_NEW = 'RN'
+    COURSE_TEAM_REQUEST_NEW = 'CN'
+    OTHER = 'OT'
+    ENTITLEMENT_SUPPORT_REASONS = (
+        (LEAVESESSION, u'Learner requested leave session for expired entitlement'),
+        (CHANGESESSION, u'Learner requested session change for expired entitlement'),
+        (LEARNER_REQUEST_NEW, u'Learner requested new entitlement'),
+        (COURSE_TEAM_REQUEST_NEW, u'Course team requested entitlement for learnerg'),
+        (OTHER, u'Other'),
+    )
     entitlement = models.ForeignKey('entitlements.CourseEntitlement')
-    support_user = models.ForeignKey(settings.AUTH_USER_MODEL, null=True)
+    support_user = models.ForeignKey(settings.AUTH_USER_MODEL)
 
     reason = models.CharField(max_length=1, choices=ENTITLEMENT_SUPPORT_REASONS)
     comments = models.TextField(null=True)
 
     unenrolled_run = models.ForeignKey(
         CourseOverview,
+        null=True,
+        blank=True,
         db_constraint=False,
     )
