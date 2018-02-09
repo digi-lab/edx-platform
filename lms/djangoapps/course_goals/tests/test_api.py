@@ -55,6 +55,13 @@ class TestCourseGoalsAPI(EventTrackingTestCase, SharedModuleStoreTestCase):
         self.assertEqual(response.status_code, 400)
         self.assertEqual(len(CourseGoal.objects.filter(user=self.user, course_key=self.course.id)), 0)
 
+    def test_add_without_goal_key(self):
+        """ Ensures if no goal key provided, post does not succeed. """
+
+        response = self.post_course_goal(goal_key=None)
+        self.assertEqual(response.status_code, 400)
+        self.assertEqual(len(CourseGoal.objects.filter(user=self.user, course_key=self.course.id)), 0)
+
     @mock.patch('lms.djangoapps.course_goals.views.update_google_analytics')
     @override_settings(LMS_SEGMENT_KEY="foobar")
     def test_update_goal(self, ga_call):
