@@ -68,18 +68,18 @@ class CompletionService(object):
         for parent blocks (right now it just stores completion for leaves-
         problems, HTML, video, etc.).
         """
-        complete = None
         if item.location.block_type != 'vertical':
             raise ValueError('The passed in xblock is not a vertical type!')
 
-        if self.completion_tracking_enabled():
-            # this is temporary local logic and will be removed when the whole course tree is included in completion
-            child_locations = [
-                child.location for child in item.get_children() if child.location.block_type != 'discussion'
-            ]
-            completions = self.get_completions(child_locations)
-            complete = True
-            for child_location in child_locations:
-                if completions[child_location] < 1.0:
-                    complete = False
-        return complete
+        if not self.completion_tracking_enabled():
+            return None
+
+        # this is temporary local logic and will be removed when the whole course tree is included in completion
+        child_locations = [
+            child.location for child in item.get_children() if child.location.block_type != 'discussion'
+        ]
+        completions = self.get_completions(child_locations)
+        for child_location in child_locations:
+            if completions[child_location] < 1.0:
+                return False
+        return True

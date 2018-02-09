@@ -211,7 +211,6 @@ class SequenceModule(SequenceFields, ProctoringFields, XModule):
 
         if dispatch == 'get_completion':
             if not self.is_user_authenticated:
-                # Without user logged in, we cannot display complete data
                 return None
 
             completion_waffle = self.runtime.service(self, 'completion_waffle')

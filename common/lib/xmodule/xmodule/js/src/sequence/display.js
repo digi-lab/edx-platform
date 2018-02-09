@@ -403,16 +403,12 @@
 
         Sequence.prototype.update_completion = function(position) {
             var element = this.link_for(position);
-            var completionUrl = '' + this.ajaxUrl + '/get_completion';
-            var key = element[0].attributes['data-id'].value;
+            var completionUrl = this.ajaxUrl + '/get_completion';
+            var usageKey = element[0].attributes['data-id'].value;
             var completionIndicators = element.find('.check-circle');
-            // it is highly questionable whether this endpoint should be a POST
-            // but that's what xmodule gives us.
             if (completionIndicators.length) {
-                // Only call completion API to check
-                // if the indicators are on the page
                 $.postWithPrefix(completionUrl, {
-                    usage_key: key
+                    usage_key: usageKey
                 }, function(data) {
                     if (data.complete === true) {
                         completionIndicators.removeClass('is-hidden');
